@@ -7,9 +7,11 @@ class Client {
     
     const API_URL = "https://signrequest.com/api/v1";
     
-    private $token;
+    public static $defaultLanguage = 'nl';   
+    
     /* @var $curl \anlutro\cURL\cURL */
     private $curl; 
+    private $token;
     
     public function __construct($token) {
         $this->token = $token;
@@ -40,15 +42,16 @@ class Client {
      */
     public function sendSignRequest($documentId, $sender, $recipients, $message = null) {
         $rcpts = [];
-        foreach ( $recipients as $r ) $rcpts []= ["email"=>$r];
+        // TODO accept language overrides
+        foreach ( $recipients as $r ) $rcpts []= ["email"=>$r, "language"=>self::$defaultLanguage]; 
         $response = $this->newRequest("signrequests")
                 ->setHeader("Content-Type", "application/json")
-                ->setData([
+                ->setData(json_encode([
                     "document"=>self::API_URL . "/documents/" . $documentId . "/",
                     "from_email"=>$sender,
                     "message"=>$message,
-                    "signers"=>json_encode($rcpts)
-                    ])
+                    "signers"=>$rcpts
+                    ]))
                 ->send();
         return $response;
     }
