@@ -1,6 +1,7 @@
 <?php
 namespace AtaneNL\SignRequest;
-namespace anlutro\cURL;
+
+use anlutro\cURL;
 
 class Client {
     
@@ -12,12 +13,16 @@ class Client {
     
     public function __construct($token) {
         $this->token = $token;
-        $this->curl = new cURL();
+        $this->curl = new cURL\cURL();
     }
     
-    public function createSignRequest($identifier, $file, $recipients) {
+    public function createSignRequest($file, $identifier = null) {
         $file = curl_file_create($file);
-        $response = $this->newRequest('documents')->setData(['file'=>$file])->send();
+        $response = $this->newRequest('documents')
+                ->setHeader("Content-Type", "multipart/form-data")
+                ->setData(['file'=>$file, 'external_id'=>$identifier])
+                ->send();
+        return $response;
     }
     
     /**
@@ -27,7 +32,7 @@ class Client {
      */
     private function newRequest($action) {
         $baseRequest = $this->curl->newRawRequest('post', self::API_URL . "/" . $action . "/")
-            ->setHeader("Authorization", $this->token);
+            ->setHeader("Authorization", "Token " . $this->token);
         return $baseRequest;
     }
     
