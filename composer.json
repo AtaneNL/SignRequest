@@ -1,0 +1,39 @@
+{
+    "name": "AtaneNL/SignRequest",
+    "description": "SignRequest API Client",
+    "keywords": ["SignRequest"],
+    "require": {
+        "php": ">=5.5.9",
+        "anlutro/curl": "^1.4"
+    },
+    "homepage": "http://www.atane.nl",
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "Daniël Oosterhuis",
+            "email": "daniel@atane.nl"
+        }
+    ],
+    "autoload": {
+        "psr-0": { "AtaneNL": "src/" }
+    },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "AtaneNL/SignRequest",
+                "version": "dev",
+                "source": {
+                    "url": "https://github.com/AtaneNL/SignRequest.git",
+                    "type": "git",
+                    "reference": "master"
+                },
+                "autoload": {
+                    "psr-0" : {
+                        "AtaneNL\\SignRequest" : "src"
+                    }
+                }
+            }
+        }
+    ]    
+}
