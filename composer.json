@@ -1,5 +1,5 @@
 {
-    "name": "AtaneNL/SignRequest",
+    "name": "atanenl/signrequest",
     "description": "SignRequest API Client",
     "keywords": ["SignRequest"],
     "require": {
@@ -15,6 +15,6 @@
         }
     ],
     "autoload": {
-        "psr-0": { "AtaneNL": "src/" }
+        "psr-0": { "AtaneNL\\SignRequest": "src/" }
     }
 }
