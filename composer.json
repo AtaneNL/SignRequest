@@ -16,24 +16,5 @@
     ],
     "autoload": {
         "psr-0": { "AtaneNL": "src/" }
-    },
-    "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "AtaneNL/SignRequest",
-                "version": "dev",
-                "source": {
-                    "url": "https://github.com/AtaneNL/SignRequest.git",
-                    "type": "git",
-                    "reference": "master"
-                },
-                "autoload": {
-                    "psr-0" : {
-                        "AtaneNL\\SignRequest" : "src"
-                    }
-                }
-            }
-        }
-    ]    
+    }
 }
