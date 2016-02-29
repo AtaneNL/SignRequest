@@ -51,7 +51,7 @@ class Client {
         $response = $this->newRequest("signrequests")
                 ->setHeader("Content-Type", "application/json")
                 ->setData(json_encode([
-                    "document"=>self::API_URL . "/documents/" . $documentId . "/",
+                    "document"=>self::API_BASEURL . "/documents/" . $documentId . "/",
                     "from_email"=>$sender,
                     "message"=>$message,
                     "signers"=>$recipients
