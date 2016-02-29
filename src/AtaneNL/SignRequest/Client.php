@@ -4,20 +4,22 @@ namespace AtaneNL\SignRequest;
 use anlutro\cURL\cURL;
 
 class Client {
-    
-    const API_URL = "https://signrequest.com/api/v1";
-    
-    public static $defaultLanguage = 'nl';   
-    
+
+    const API_BASEURL = "https://signrequest.com/api/v1";
+
+    public static $defaultLanguage = 'nl';
+
     /* @var $curl \anlutro\cURL\cURL */
-    private $curl; 
+    private $curl;
     private $token;
-    
-    public function __construct($token) {
+    private $subdomain; // the subdomain
+
+    public function __construct($token, $subdomain= null) {
         $this->token = $token;
+        $this->subdomain = $subdomain;
         $this->curl = new cURL();
     }
-    
+
     /**
      * Send a document to SignRequest.
      * @param type $file
@@ -32,7 +34,7 @@ class Client {
                 ->send();
         return new CreateDocumentResponse($response);
     }
-    
+
     /**
      * Send a sign request for a created document.
      * @param type $documentId
@@ -41,30 +43,37 @@ class Client {
      * @param type $message
      */
     public function sendSignRequest($documentId, $sender, $recipients, $message = null) {
-        $rcpts = [];
-        // TODO accept language overrides
-        foreach ( $recipients as $r ) $rcpts []= ["email"=>$r, "language"=>self::$defaultLanguage]; 
+        foreach ( $recipients as &$r ) {
+            if (!array_key_exists('language', $r)) {
+                $r['language'] = self::$defaultLanguage;
+            }
+        }
         $response = $this->newRequest("signrequests")
                 ->setHeader("Content-Type", "application/json")
                 ->setData(json_encode([
                     "document"=>self::API_URL . "/documents/" . $documentId . "/",
                     "from_email"=>$sender,
                     "message"=>$message,
-                    "signers"=>$rcpts
+                    "signers"=>$recipients
                     ]))
                 ->send();
-        return $response;
+        $responseObj = json_decode($response);
+        if (!$responseObj->uuid) {
+            throw new Exceptions\SendSignRequestException($response);
+        }
+        return $responseObj->uuid;
     }
-    
+
     /**
-     * 
+     * Setup a base request object.
      * @param type $action
      * @return \anlutro\cURL\Request
      */
     private function newRequest($action) {
-        $baseRequest = $this->curl->newRawRequest('post', self::API_URL . "/" . $action . "/")
-            ->setHeader("Authorization", "Token " . $this->token);
+        $baseRequest = $this->curl->newRawRequest('post', self::API_BASEURL . "/" . $action . "/")
+            ->setHeader("Authorization", "Token " . $this->token)
+            ->setData('subdomain', $this->subdomain);
         return $baseRequest;
     }
-    
+
 }
