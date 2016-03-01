@@ -22,15 +22,16 @@ class Client {
 
     /**
      * Send a document to SignRequest.
-     * @param type $file
-     * @param type $identifier
+     * @param string $file The absolute path to a file.
+     * @param string $identifier
+     * @param string $callbackUrl
      * @return CreateDocumentResponse
      */
-    public function createDocument($file, $identifier = null) {
+    public function createDocument($file, $identifier, $callbackUrl = null) {
         $file = curl_file_create($file);
         $response = $this->newRequest("documents")
                 ->setHeader("Content-Type", "multipart/form-data")
-                ->setData(['file'=>$file, 'external_id'=>$identifier])
+                ->setData(['file'=>$file, 'external_id'=>$identifier, 'events_callback_url'=>$callbackUrl])
                 ->send();
         return new CreateDocumentResponse($response);
     }
