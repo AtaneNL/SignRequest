@@ -33,6 +33,9 @@ class Client {
                 ->setHeader("Content-Type", "multipart/form-data")
                 ->setData(['file'=>$file, 'external_id'=>$identifier, 'events_callback_url'=>$callbackUrl])
                 ->send();
+        if ($this->hasErrors($response)) {
+            throw new Exceptions\SendSignRequestException($response);
+        }
         return new CreateDocumentResponse($response);
     }
 
@@ -58,11 +61,34 @@ class Client {
                     "signers"=>$recipients
                     ]))
                 ->send();
-        $responseObj = json_decode($response);
-        if (!$responseObj->uuid) {
+        $responseObj = json_decode($response->body);
+        if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
         }
         return $responseObj->uuid;
+    }
+
+    /**
+     * Create a new team.
+     * @param string $name
+     * @param slug $subdomain
+     * @param string $callbackUrl
+     */
+    public function createTeam($name, $subdomain, $callbackUrl = null) {
+        $response = $this->newRequest("teams")
+                ->setHeader("Content-Type", "application/json")
+                ->setData(json_encode([
+                    "name"=>$name,
+                    "subdomain"=>$subdomain,
+                    "events_callback_url"=>$callbackUrl
+                    ]))
+                ->send();
+
+        $responseObj = json_decode($response->body);
+        if ($this->hasErrors($response)) {
+            throw new Exceptions\SendSignRequestException("Unable to create team $name: ".$response);
+        }
+        return $responseObj->subdomain;
     }
 
     /**
@@ -75,6 +101,14 @@ class Client {
             ->setHeader("Authorization", "Token " . $this->token)
             ->setData('subdomain', $this->subdomain);
         return $baseRequest;
+    }
+
+    /**
+     * Check for error in status headers.
+     * @param type $response
+     */
+    private function hasErrors($response) {
+        return !preg_match('/^20\d$/', $response->statusCode);
     }
 
 }
