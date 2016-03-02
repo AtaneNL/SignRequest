@@ -95,8 +95,7 @@ class Client {
                 ->setHeader("Content-Type", "application/json")
                 ->setData(json_encode([
                     "name"=>$name,
-                    "subdomain"=>$subdomain,
-                    "events_callback_url"=>$callbackUrl
+                    "subdomain"=>$subdomain
                     ]))
                 ->send();
 
