@@ -62,10 +62,10 @@ class Client {
                     "signers"=>$recipients
                     ]))
                 ->send();
-        $responseObj = json_decode($response->body);
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
         }
+        $responseObj = json_decode($response->body);
         return $responseObj->uuid;
     }
 
@@ -75,10 +75,10 @@ class Client {
      */
     public function getDocument($documentId) {
         $response = $this->newRequest("documents/{$documentId}", "get")->send();
-        $responseObj = json_decode($response->body);
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
         }
+        $responseObj = json_decode($response->body);
         return $responseObj;
     }
 
@@ -100,10 +100,10 @@ class Client {
                     ]))
                 ->send();
 
-        $responseObj = json_decode($response->body);
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException("Unable to create team $name: ".$response);
         }
+        $responseObj = json_decode($response->body);
         return $responseObj->subdomain;
     }
 
