@@ -45,6 +45,7 @@ class Client {
      * @param type $sender
      * @param type $recipients
      * @param type $message
+     * @return uuid The document id
      */
     public function sendSignRequest($documentId, $sender, $recipients, $message = null) {
         foreach ( $recipients as &$r ) {
@@ -67,6 +68,21 @@ class Client {
         }
         return $responseObj->uuid;
     }
+
+    /**
+     * Get a file.
+     * @param uuid $documentId
+     */
+    public function getDocument($documentId) {
+        $response = $this->newRequest("documents/{$documentId}", "get")->send();
+        $responseObj = json_decode($response->body);
+        if ($this->hasErrors($response)) {
+            throw new Exceptions\SendSignRequestException($response);
+        }
+        return $responseObj;
+    }
+
+
 
     /**
      * Create a new team.
@@ -93,11 +109,12 @@ class Client {
 
     /**
      * Setup a base request object.
-     * @param type $action
+     * @param string $action
+     * @param string $method post,put,get,delete,option
      * @return \anlutro\cURL\Request
      */
-    private function newRequest($action) {
-        $baseRequest = $this->curl->newRawRequest('post', self::API_BASEURL . "/" . $action . "/")
+    private function newRequest($action, $method = 'post') {
+        $baseRequest = $this->curl->newRawRequest($method, self::API_BASEURL . "/" . $action . "/")
             ->setHeader("Authorization", "Token " . $this->token)
             ->setData('subdomain', $this->subdomain);
         return $baseRequest;
