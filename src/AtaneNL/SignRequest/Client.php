@@ -31,7 +31,7 @@ class Client {
         $file = curl_file_create($file);
         $response = $this->newRequest("documents")
                 ->setHeader("Content-Type", "multipart/form-data")
-                ->setData(['file'=>$file, 'external_id'=>$identifier, 'events_callback_url'=>$callbackUrl])
+                ->setData(['file'=>$file, 'external_id'=>$identifier, 'events_callback_url'=>$callbackUrl, 'team'=>['subdomain'=>$this->subdomain]])
                 ->send();
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
@@ -41,10 +41,10 @@ class Client {
 
     /**
      * Send a sign request for a created document.
-     * @param type $documentId
-     * @param type $sender
-     * @param type $recipients
-     * @param type $message
+     * @param uuid $documentId
+     * @param string $sender Senders e-mail address
+     * @param array $recipients
+     * @param string $message
      * @return uuid The document id
      */
     public function sendSignRequest($documentId, $sender, $recipients, $message = null) {
