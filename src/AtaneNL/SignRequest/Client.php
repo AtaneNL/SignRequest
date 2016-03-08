@@ -70,8 +70,23 @@ class Client {
     }
 
     /**
+     * Gets the current status for a sign request.
+     * @param uuid $signRequestId
+     * @return \stdClass response
+     */
+    public function getSignRequestStatus($signRequestId) {
+        $response = $this->newRequest("signrequests/{$signRequestId}", "get")->send();
+        if ($this->hasErrors($response)) {
+            throw new Exceptions\SendSignRequestException($response);
+        }
+        $responseObj = json_decode($response->body);
+        return $responseObj;
+    }
+
+    /**
      * Get a file.
      * @param uuid $documentId
+     * @return \stdClass response
      */
     public function getDocument($documentId) {
         $response = $this->newRequest("documents/{$documentId}", "get")->send();
