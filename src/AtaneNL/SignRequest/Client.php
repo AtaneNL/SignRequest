@@ -70,9 +70,25 @@ class Client {
     }
 
     /**
+     * Send a reminder to all recipients who have not signed yet.
+     * @param uuid $signRequestId
+     * @return \stdClass response
+     * @throws Exceptions\RemoteException
+     */
+    public function sendSignRequestReminder($signRequestId) {
+        $response = $this->newRequest("signrequests/{$signRequestId}/resend_signrequest_email", "post")->send();
+        if ($this->hasErrors($response)) {
+            throw new Exceptions\RemoteException($response);
+        }
+        $responseObj = json_decode($response->body);
+        return $responseObj;
+    }
+
+    /**
      * Gets the current status for a sign request.
      * @param uuid $signRequestId
      * @return \stdClass response
+     * @throws Exceptions\RemoteException
      */
     public function getSignRequestStatus($signRequestId) {
         $response = $this->newRequest("signrequests/{$signRequestId}", "get")->send();
@@ -87,6 +103,7 @@ class Client {
      * Get a file.
      * @param uuid $documentId
      * @return \stdClass response
+     * @throws Exceptions\RemoteException
      */
     public function getDocument($documentId) {
         $response = $this->newRequest("documents/{$documentId}", "get")->send();
@@ -104,6 +121,7 @@ class Client {
      * @param string $name
      * @param slug $subdomain
      * @param string $callbackUrl
+     * @throws Exceptions\RemoteException
      */
     public function createTeam($name, $subdomain, $callbackUrl = null) {
         $response = $this->newRequest("teams")
