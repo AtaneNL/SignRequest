@@ -77,7 +77,7 @@ class Client {
     public function getSignRequestStatus($signRequestId) {
         $response = $this->newRequest("signrequests/{$signRequestId}", "get")->send();
         if ($this->hasErrors($response)) {
-            throw new Exceptions\SendSignRequestException($response);
+            throw new Exceptions\RemoteException($response);
         }
         $responseObj = json_decode($response->body);
         return $responseObj;
@@ -91,7 +91,7 @@ class Client {
     public function getDocument($documentId) {
         $response = $this->newRequest("documents/{$documentId}", "get")->send();
         if ($this->hasErrors($response)) {
-            throw new Exceptions\SendSignRequestException($response);
+            throw new Exceptions\RemoteException($response);
         }
         $responseObj = json_decode($response->body);
         return $responseObj;
@@ -115,7 +115,7 @@ class Client {
                 ->send();
 
         if ($this->hasErrors($response)) {
-            throw new Exceptions\SendSignRequestException("Unable to create team $name: ".$response);
+            throw new Exceptions\RemoteException("Unable to create team $name: ".$response);
         }
         $responseObj = json_decode($response->body);
         return $responseObj->subdomain;
