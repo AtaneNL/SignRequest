@@ -80,7 +80,9 @@ class Client {
      * @throws Exceptions\RemoteException
      */
     public function sendSignRequestReminder($signRequestId) {
-        $response = $this->newRequest("signrequests/{$signRequestId}/resend_signrequest_email", "post")->send();
+        $response = $this->newRequest("signrequests/{$signRequestId}/resend_signrequest_email", "post")
+                ->setHeader("Content-Type", "application/json")
+                ->send();
         if ($this->hasErrors($response)) {
             throw new Exceptions\RemoteException($response);
         }
@@ -162,7 +164,7 @@ class Client {
      * @return string API url
      */
     private function getApiUrl() {
-        return preg_replace('/\[SUBDOMAIN\]/', $this->subdomain, self::API_BASEURL);
+        return preg_replace('/\[SUBDOMAIN\]/', ltrim($this->subdomain .".", "."), self::API_BASEURL);
     }
 
     /**
