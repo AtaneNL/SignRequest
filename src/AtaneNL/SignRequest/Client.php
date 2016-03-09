@@ -3,6 +3,8 @@ namespace AtaneNL\SignRequest;
 
 use anlutro\cURL\cURL;
 
+// TODO move requests to individual classes
+
 class Client {
 
     const API_BASEURL = "https://[SUBDOMAIN]signrequest.com/api/v1";
@@ -63,7 +65,10 @@ class Client {
                     "document"=>self::API_BASEURL . "/documents/" . $documentId . "/",
                     "from_email"=>$sender,
                     "message"=>$message,
-                    "signers"=>$recipients
+                    "signers"=>$recipients,
+                    "disable_text"=>true,
+                    "disable_attachments"=>true,
+                    "disable_date"=>true
                     ]))
                 ->send();
         if ($this->hasErrors($response)) {
