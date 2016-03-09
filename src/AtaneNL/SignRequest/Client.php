@@ -5,7 +5,7 @@ use anlutro\cURL\cURL;
 
 class Client {
 
-    const API_BASEURL = "https://signrequest.com/api/v1";
+    const API_BASEURL = "https://[SUBDOMAIN]signrequest.com/api/v1";
 
     public static $defaultLanguage = 'nl';
 
@@ -14,7 +14,7 @@ class Client {
     private $token;
     private $subdomain; // the subdomain
 
-    public function __construct($token, $subdomain= null) {
+    public function __construct($token, $subdomain = null) {
         $this->token = $token;
         $this->subdomain = $subdomain;
         $this->curl = new cURL();
@@ -31,7 +31,11 @@ class Client {
         $file = curl_file_create($file);
         $response = $this->newRequest("documents")
                 ->setHeader("Content-Type", "multipart/form-data")
-                ->setData(['file'=>$file, 'external_id'=>$identifier, 'events_callback_url'=>$callbackUrl, 'team'=>['subdomain'=>$this->subdomain]])
+                ->setData([
+                    'file'=>$file,
+                    'external_id'=>$identifier,
+                    'events_callback_url'=>$callbackUrl
+                    ])
                 ->send();
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
@@ -114,16 +118,18 @@ class Client {
         return $responseObj;
     }
 
-
-
     /**
      * Create a new team.
+     * The client should be initialized *without* a subdomain for this method to function properly!!!
      * @param string $name
      * @param slug $subdomain
      * @param string $callbackUrl
      * @throws Exceptions\RemoteException
      */
     public function createTeam($name, $subdomain, $callbackUrl = null) {
+        if ($this->subdomain !== null) {
+            throw new Exceptions\LocalException("This request cannot be sent to a subdomain. Initialize the client without a subdomain.");
+        }
         $response = $this->newRequest("teams")
                 ->setHeader("Content-Type", "application/json")
                 ->setData(json_encode([
@@ -146,10 +152,17 @@ class Client {
      * @return \anlutro\cURL\Request
      */
     private function newRequest($action, $method = 'post') {
-        $baseRequest = $this->curl->newRawRequest($method, self::API_BASEURL . "/" . $action . "/")
-            ->setHeader("Authorization", "Token " . $this->token)
-            ->setData('subdomain', $this->subdomain);
+        $baseRequest = $this->curl->newRawRequest($method, $this->getApiUrl() . "/" . $action . "/")
+            ->setHeader("Authorization", "Token " . $this->token);
         return $baseRequest;
+    }
+
+    /**
+     * Set the API url based on the subdomain.
+     * @return string API url
+     */
+    private function getApiUrl() {
+        return preg_replace('/\[SUBDOMAIN\]/', $this->subdomain, self::API_BASEURL);
     }
 
     /**
