@@ -2,6 +2,8 @@
 namespace AtaneNL\SignRequest;
 
 use anlutro\cURL\cURL;
+use anlutro\cURL\Request;
+use anlutro\cURL\Response;
 
 // TODO move requests to individual classes
 
@@ -28,6 +30,7 @@ class Client {
      * @param string $identifier
      * @param string $callbackUrl
      * @return CreateDocumentResponse
+     * @throws Exceptions\SendSignRequestException
      */
     public function createDocument($file, $identifier, $callbackUrl = null) {
         $file = curl_file_create($file);
@@ -47,11 +50,12 @@ class Client {
 
     /**
      * Send a sign request for a created document.
-     * @param uuid $documentId
+     * @param string $documentId uuid
      * @param string $sender Senders e-mail address
      * @param array $recipients
      * @param string $message
-     * @return uuid The document id
+     * @return string The document id
+     * @throws Exceptions\SendSignRequestException
      */
     public function sendSignRequest($documentId, $sender, $recipients, $message = null) {
         foreach ( $recipients as &$r ) {
@@ -80,7 +84,7 @@ class Client {
 
     /**
      * Send a reminder to all recipients who have not signed yet.
-     * @param uuid $signRequestId
+     * @param string $signRequestId uuid
      * @return \stdClass response
      * @throws Exceptions\RemoteException
      */
@@ -97,7 +101,7 @@ class Client {
 
     /**
      * Gets the current status for a sign request.
-     * @param uuid $signRequestId
+     * @param string $signRequestId uuid
      * @return \stdClass response
      * @throws Exceptions\RemoteException
      */
@@ -112,7 +116,7 @@ class Client {
 
     /**
      * Get a file.
-     * @param uuid $documentId
+     * @param string $documentId uuid
      * @return \stdClass response
      * @throws Exceptions\RemoteException
      */
@@ -129,8 +133,10 @@ class Client {
      * Create a new team.
      * The client should be initialized *without* a subdomain for this method to function properly!!!
      * @param string $name
-     * @param slug $subdomain
+     * @param string $subdomain
      * @param string $callbackUrl
+     * @return string
+     * @throws Exceptions\LocalException
      * @throws Exceptions\RemoteException
      */
     public function createTeam($name, $subdomain, $callbackUrl = null) {
@@ -156,7 +162,7 @@ class Client {
      * Setup a base request object.
      * @param string $action
      * @param string $method post,put,get,delete,option
-     * @return \anlutro\cURL\Request
+     * @return Request
      */
     private function newRequest($action, $method = 'post') {
         $baseRequest = $this->curl->newRawRequest($method, $this->getApiUrl() . "/" . $action . "/")
@@ -174,7 +180,8 @@ class Client {
 
     /**
      * Check for error in status headers.
-     * @param type $response
+     * @param Response $response
+     * @return bool
      */
     private function hasErrors($response) {
         return !preg_match('/^20\d$/', $response->statusCode);
