@@ -159,6 +159,48 @@ class Client {
     }
 
     /**
+     * @param string $subdomain
+     * @return \stdClass
+     * @throws Exceptions\LocalException
+     * @throws Exceptions\RemoteException
+     */
+    public function getTeam($subdomain)
+    {
+        if ($this->subdomain !== null) {
+            throw new Exceptions\LocalException("This request cannot be sent to a subdomain. Initialize the client without a subdomain.");
+        }
+        $response = $this->newRequest("teams/${subdomain}", 'get')->send();
+
+        if ($this->hasErrors($response)) {
+            throw new Exceptions\RemoteException("Unable to get team $subdomain: ".$response);
+        }
+        return json_decode($response->body);
+    }
+
+    /**
+     * @param string $subdomain
+     * @param array|\stdClass $params (specify any parameters to update, such as name, logo, phone, primary_color)
+     * @return \stdClass
+     * @throws Exceptions\LocalException
+     * @throws Exceptions\RemoteException
+     */
+    public function updateTeam($subdomain, $params)
+    {
+        if ($this->subdomain !== null) {
+            throw new Exceptions\LocalException("This request cannot be sent to a subdomain. Initialize the client without a subdomain.");
+        }
+        $response = $this->newRequest("teams/${subdomain}", 'patch')
+            ->setHeader("Content-Type", "application/json")
+            ->setData(json_encode($params))
+            ->send();
+
+        if ($this->hasErrors($response)) {
+            throw new Exceptions\RemoteException("Unable to update team $subdomain: ".$response);
+        }
+        return json_decode($response->body);
+    }
+
+    /**
      * Setup a base request object.
      * @param string $action
      * @param string $method post,put,get,delete,option
