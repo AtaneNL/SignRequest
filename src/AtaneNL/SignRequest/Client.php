@@ -48,6 +48,29 @@ class Client {
         return new CreateDocumentResponse($response);
     }
 
+	/**
+	 * Add attachment to document sent to SignRequest.
+	 * @param string $file The absolute path to a file.
+	 * @param CreateDocumentResponse $cdr
+	 * @return \stdClass response
+	 * @throws Exceptions\SendSignRequestException
+	 */
+	public function addAttachmentToDocument($file, CreateDocumentResponse $cdr) {
+		$file = curl_file_create($file);
+		$response = $this->newRequest("document-attachments")
+				->setHeader("Content-Type", "multipart/form-data")
+				->setData([
+					'file' => $file,
+					'document' => $cdr->url
+				])
+				->send();
+		if ($this->hasErrors($response)) {
+			throw new Exceptions\SendSignRequestException($response);
+		}
+		$responseObj = json_decode($response->body);
+		return $responseObj;
+	}
+	
     /**
      * Send a sign request for a created document.
      * @param string $documentId uuid
