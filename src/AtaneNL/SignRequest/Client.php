@@ -48,6 +48,29 @@ class Client {
         return new CreateDocumentResponse($response);
     }
 
+    /**
+     * Send a document to SignRequest using the file_from_url option.
+     * @param string $url The URL of the page we want to sign.
+     * @param string $identifier
+     * @param string $callbackUrl
+     * @return CreateDocumentResponse
+     * @throws Exceptions\SendSignRequestException
+     */
+    public function createDocumentFromURL($url, $identifier, $callbackUrl = null) {
+        $response = $this->newRequest("documents")
+                ->setHeader("Content-Type", "multipart/form-data")
+                ->setData([
+                    'file_from_url'=>$url,
+                    'external_id'=>$identifier,
+                    'events_callback_url'=>$callbackUrl
+                    ])
+                ->send();
+        if ($this->hasErrors($response)) {
+            throw new Exceptions\SendSignRequestException($response);
+        }
+        return new CreateDocumentResponse($response);
+    }
+	
 	/**
 	 * Add attachment to document sent to SignRequest.
 	 * @param string $file The absolute path to a file.
