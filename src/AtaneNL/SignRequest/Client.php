@@ -100,7 +100,7 @@ class Client {
      * @param string $sender Senders e-mail address
      * @param array $recipients
      * @param string $message
-     * @return string The document id
+     * @return \stdClass The SignRequest
      * @throws Exceptions\SendSignRequestException
      */
     public function sendSignRequest($documentId, $sender, $recipients, $message = null) {
@@ -125,7 +125,7 @@ class Client {
             throw new Exceptions\SendSignRequestException($response);
         }
         $responseObj = json_decode($response->body);
-        return $responseObj->uuid;
+        return $responseObj;
     }
 
     /**
