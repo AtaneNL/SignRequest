@@ -27,21 +27,22 @@ class Client {
     /**
      * Send a document to SignRequest.
      * @param string $file The absolute path to a file.
-     * @param string $identifier
-     * @param string $callbackUrl
+     * @param string $identifier unique identifier for this file
+     * @param string $callbackUrl [optional] url to call when signing is completed
+     * @param string $filename [optional] the filename as the signer will see it
      * @return CreateDocumentResponse
      * @throws Exceptions\SendSignRequestException
      */
-    public function createDocument($file, $identifier, $callbackUrl = null) {
-        $file = curl_file_create($file);
+    public function createDocument($file, $identifier, $callbackUrl = null, $filename = null) {
+        $file = curl_file_create($file, null, $filename);
         $response = $this->newRequest("documents")
-                ->setHeader("Content-Type", "multipart/form-data")
-                ->setData([
-                    'file'=>$file,
-                    'external_id'=>$identifier,
-                    'events_callback_url'=>$callbackUrl
-                    ])
-                ->send();
+            ->setHeader("Content-Type", "multipart/form-data")
+            ->setData([
+                'file'=>$file,
+                'external_id'=>$identifier,
+                'events_callback_url'=>$callbackUrl
+            ])
+            ->send();
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
         }
