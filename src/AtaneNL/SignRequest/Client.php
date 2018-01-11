@@ -71,7 +71,7 @@ class Client {
         }
         return new CreateDocumentResponse($response);
     }
-	
+
 	/**
 	 * Add attachment to document sent to SignRequest.
 	 * @param string $file The absolute path to a file.
@@ -94,7 +94,7 @@ class Client {
 		$responseObj = json_decode($response->body);
 		return $responseObj;
 	}
-	
+
     /**
      * Send a sign request for a created document.
      * @param string $documentId uuid
@@ -144,6 +144,25 @@ class Client {
         }
         $responseObj = json_decode($response->body);
         return $responseObj;
+    }
+
+    /**
+     * Cancel an existing sign request
+     * @param string $signRequestId uuid
+     * @return mixed
+     * @throws Exceptions\RemoteException
+     */
+    public function cancelSignRequest($signRequestId) {
+        $response = $this
+            ->newRequest("signrequests/{$signRequestId}/cancel_signrequest")
+            ->setHeader("Content-Type", "application/json")
+            ->send();
+
+        if ($this->hasErrors($response)) {
+            throw new Exceptions\RemoteException($response);
+        }
+
+        return json_decode($response->body);
     }
 
     /**
