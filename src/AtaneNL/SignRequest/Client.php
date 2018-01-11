@@ -101,27 +101,30 @@ class Client {
      * @param string $sender Senders e-mail address
      * @param array $recipients
      * @param string $message
+     * @param bool $sendReminders Send automatic reminders
      * @return \stdClass The SignRequest
      * @throws Exceptions\SendSignRequestException
      */
-    public function sendSignRequest($documentId, $sender, $recipients, $message = null) {
-        foreach ( $recipients as &$r ) {
+    public function sendSignRequest($documentId, $sender, $recipients, $message = null, $sendReminders = false) {
+        foreach ($recipients as &$r) {
             if (!array_key_exists('language', $r)) {
                 $r['language'] = self::$defaultLanguage;
             }
         }
         $response = $this->newRequest("signrequests")
-                ->setHeader("Content-Type", "application/json")
-                ->setData(json_encode([
-                    "document"=>self::API_BASEURL . "/documents/" . $documentId . "/",
-                    "from_email"=>$sender,
-                    "message"=>$message,
-                    "signers"=>$recipients,
-                    "disable_text"=>true,
-                    "disable_attachments"=>true,
-                    "disable_date"=>true
-                    ]))
-                ->send();
+            ->setHeader("Content-Type", "application/json")
+            ->setData(json_encode([
+                                      "document"            => self::API_BASEURL . "/documents/" . $documentId . "/",
+                                      "from_email"          => $sender,
+                                      "message"             => $message,
+                                      "signers"             => $recipients,
+                                      "disable_text"        => true,
+                                      "disable_attachments" => true,
+                                      "disable_date"        => true,
+                                      "send_reminders"      => $sendReminders
+
+                                  ]))
+            ->send();
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
         }
