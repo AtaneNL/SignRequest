@@ -7,7 +7,7 @@
         "anlutro/curl": "^1.4"
     },
     "homepage": "http://www.atane.nl",
-    "license": "GPL",
+    "license": "GPL-3.0-or-later",
     "authors": [
         {
             "name": "Daniël Oosterhuis",
