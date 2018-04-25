@@ -25,6 +25,24 @@ class Client
         $this->subdomain = $subdomain;
         $this->curl = new cURL();
     }
+    
+    /**
+     * Gets templates from sign request frontend.
+     *
+     * @return \stdClass response
+     *
+     * @throws Exceptions\RemoteException
+     */
+    public function getTemplates()
+    {
+        $response = $this->newRequest('templates', 'get')->send();
+        if ($this->hasErrors($response)) {
+            throw new Exceptions\RemoteException($response);
+        }
+        $responseObj = json_decode($response->body);
+
+        return $responseObj;
+    }
 
     /**
      * Send a document to SignRequest.
@@ -71,6 +89,35 @@ class Client
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
         }
+        return new CreateDocumentResponse($response);
+    }
+    
+    /**
+     * Send a document to SignRequest using the template option.
+     *
+     * @param string $url         the URL of the template we want to sign
+     * @param string $identifier
+     * @param string $callbackUrl
+     *
+     * @return CreateDocumentResponse
+     *
+     * @throws Exceptions\SendSignRequestException
+     */
+    public function createDocumentFromTemplate($url, $identifier = null, $callbackUrl = null)
+    {
+        $response = $this->newRequest('documents')
+            ->setHeader('Content-Type', 'multipart/form-data')
+            ->setData([
+                'template' => $url,
+                'external_id' => $identifier,
+                'events_callback_url' => $callbackUrl,
+            ])
+            ->send();
+
+        if ($this->hasErrors($response)) {
+            throw new Exceptions\SendSignRequestException($response);
+        }
+
         return new CreateDocumentResponse($response);
     }
 
