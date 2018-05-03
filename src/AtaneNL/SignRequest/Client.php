@@ -103,15 +103,15 @@ class Client
      *
      * @throws Exceptions\SendSignRequestException
      */
-    public function createDocumentFromTemplate($url, $identifier = null, $callbackUrl = null)
+    public function createDocumentFromTemplate($url, $identifier = null, $callbackUrl = null, $settings = [])
     {
         $response = $this->newRequest('documents')
             ->setHeader('Content-Type', 'multipart/form-data')
-            ->setData([
+            ->setData(array_merge($settings, [
                 'template' => $url,
                 'external_id' => $identifier,
                 'events_callback_url' => $callbackUrl,
-            ])
+            ]))
             ->send();
 
         if ($this->hasErrors($response)) {
@@ -151,11 +151,11 @@ class Client
      * @param array $recipients
      * @param string $message
      * @param bool $sendReminders Send automatic reminders
-     * @param array $additionalParams Add additional request parameters or override defaults
+     * @param array $settings Add additional request parameters or override defaults
      * @return \stdClass The SignRequest
      * @throws Exceptions\SendSignRequestException
      */
-    public function sendSignRequest($documentId, $sender, $recipients, $message = null, $sendReminders = false, $additionalParams = []) {
+    public function sendSignRequest($documentId, $sender, $recipients, $message = null, $sendReminders = false, $settings = []) {
         foreach ($recipients as &$r) {
             if (!array_key_exists('language', $r)) {
                 $r['language'] = self::$defaultLanguage;
@@ -167,7 +167,7 @@ class Client
                                                   "disable_text"        => true,
                                                   "disable_attachments" => true,
                                                   "disable_date"        => true,
-                                              ], $additionalParams, [
+                                              ], $settings, [
                                                   "document"       => self::API_BASEURL . "/documents/" . $documentId . "/",
                                                   "from_email"     => $sender,
                                                   "message"        => $message,
