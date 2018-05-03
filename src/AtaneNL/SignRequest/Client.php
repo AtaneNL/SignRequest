@@ -50,18 +50,19 @@ class Client
      * @param string $identifier unique identifier for this file
      * @param string $callbackUrl [optional] url to call when signing is completed
      * @param string $filename [optional] the filename as the signer will see it
+     * @param array $settings [optional]
      * @return CreateDocumentResponse
      * @throws Exceptions\SendSignRequestException
      */
-    public function createDocument($file, $identifier, $callbackUrl = null, $filename = null) {
+    public function createDocument($file, $identifier, $callbackUrl = null, $filename = null, $settings = []) {
         $file = curl_file_create($file, null, $filename);
         $response = $this->newRequest("documents")
             ->setHeader("Content-Type", "multipart/form-data")
-            ->setData([
+            ->setData(array_merge($settings, [
                           'file'                => $file,
                           'external_id'         => $identifier,
                           'events_callback_url' => $callbackUrl
-                      ])
+                      ]))
             ->send();
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
@@ -74,17 +75,18 @@ class Client
      * @param string $url The URL of the page we want to sign.
      * @param string $identifier
      * @param string $callbackUrl
+     * @param array $settings [optional]
      * @return CreateDocumentResponse
      * @throws Exceptions\SendSignRequestException
      */
-    public function createDocumentFromURL($url, $identifier, $callbackUrl = null) {
+    public function createDocumentFromURL($url, $identifier, $callbackUrl = null, $settings = []) {
         $response = $this->newRequest("documents")
             ->setHeader("Content-Type", "multipart/form-data")
-            ->setData([
+            ->setData(array_merge($settings, [
                           'file_from_url'       => $url,
                           'external_id'         => $identifier,
                           'events_callback_url' => $callbackUrl
-                      ])
+                      ]))
             ->send();
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
@@ -98,9 +100,8 @@ class Client
      * @param string $url         the URL of the template we want to sign
      * @param string $identifier
      * @param string $callbackUrl
-     *
+     * @param array $settings [optional]
      * @return CreateDocumentResponse
-     *
      * @throws Exceptions\SendSignRequestException
      */
     public function createDocumentFromTemplate($url, $identifier = null, $callbackUrl = null, $settings = [])
