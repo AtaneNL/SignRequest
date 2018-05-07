@@ -164,7 +164,7 @@ class Client
         }
         $response = $this->newRequest("signrequests")
             ->setHeader("Content-Type", "application/json")
-            ->setData(json_encode(array_merge([
+            ->setData(array_merge([
                                                   "disable_text"        => true,
                                                   "disable_attachments" => true,
                                                   "disable_date"        => true,
@@ -174,7 +174,7 @@ class Client
                                                   "message"        => $message,
                                                   "signers"        => $recipients,
                                                   "send_reminders" => $sendReminders
-                                              ])))
+                                              ]))
             ->send();
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
@@ -264,10 +264,10 @@ class Client
         }
         $response = $this->newRequest("teams")
             ->setHeader("Content-Type", "application/json")
-            ->setData(json_encode([
-                                      "name"      => $name,
-                                      "subdomain" => $subdomain
-                                  ]))
+            ->setData([
+                          "name"      => $name,
+                          "subdomain" => $subdomain
+                      ])
             ->send();
 
         if ($this->hasErrors($response)) {
@@ -308,7 +308,7 @@ class Client
         }
         $response = $this->newRequest("teams/${subdomain}", 'patch')
             ->setHeader("Content-Type", "application/json")
-            ->setData(json_encode($params))
+            ->setData($params)
             ->send();
 
         if ($this->hasErrors($response)) {
