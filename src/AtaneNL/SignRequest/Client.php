@@ -28,9 +28,7 @@ class Client
     
     /**
      * Gets templates from sign request frontend.
-     *
      * @return \stdClass response
-     *
      * @throws Exceptions\RemoteException
      */
     public function getTemplates()
@@ -40,7 +38,6 @@ class Client
             throw new Exceptions\RemoteException($response);
         }
         $responseObj = json_decode($response->body);
-
         return $responseObj;
     }
 
@@ -96,7 +93,6 @@ class Client
     
     /**
      * Send a document to SignRequest using the template option.
-     *
      * @param string $url         the URL of the template we want to sign
      * @param string $identifier
      * @param string $callbackUrl
