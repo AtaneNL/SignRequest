@@ -58,11 +58,11 @@ class Client
         $file = curl_file_create($file, null, $filename);
         $response = $this->newRequest("documents")
             ->setHeader("Content-Type", "multipart/form-data")
-            ->setData(json_encode(array_merge($settings, [
+            ->setData(array_merge($settings, [
                           'file'                => $file,
                           'external_id'         => $identifier,
                           'events_callback_url' => $callbackUrl
-                      ])))
+                      ]))
             ->send();
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
@@ -82,11 +82,11 @@ class Client
     public function createDocumentFromURL($url, $identifier, $callbackUrl = null, $settings = []) {
         $response = $this->newRequest("documents")
             ->setHeader("Content-Type", "multipart/form-data")
-            ->setData(json_encode(array_merge($settings, [
+            ->setData(array_merge($settings, [
                           'file_from_url'       => $url,
                           'external_id'         => $identifier,
                           'events_callback_url' => $callbackUrl
-                      ])))
+                      ]))
             ->send();
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
@@ -108,11 +108,11 @@ class Client
     {
         $response = $this->newRequest('documents')
             ->setHeader('Content-Type', 'multipart/form-data')
-            ->setData(json_encode(array_merge($settings, [
+            ->setData(array_merge($settings, [
                 'template' => $url,
                 'external_id' => $identifier,
                 'events_callback_url' => $callbackUrl,
-            ])))
+            ]))
             ->send();
 
         if ($this->hasErrors($response)) {
@@ -133,10 +133,10 @@ class Client
         $file = curl_file_create($file);
         $response = $this->newRequest("document-attachments")
             ->setHeader("Content-Type", "multipart/form-data")
-            ->setData(json_encode([
+            ->setData([
                           'file'     => $file,
                           'document' => $cdr->url
-                      ]))
+                      ])
             ->send();
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
