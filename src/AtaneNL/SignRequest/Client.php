@@ -25,21 +25,6 @@ class Client
         $this->subdomain = $subdomain;
         $this->curl = new cURL();
     }
-    
-    /**
-     * Gets templates from sign request frontend.
-     * @return \stdClass response
-     * @throws Exceptions\RemoteException
-     */
-    public function getTemplates()
-    {
-        $response = $this->newRequest('templates', 'get')->send();
-        if ($this->hasErrors($response)) {
-            throw new Exceptions\RemoteException($response);
-        }
-        $responseObj = json_decode($response->body);
-        return $responseObj;
-    }
 
     /**
      * Send a document to SignRequest.
@@ -56,10 +41,10 @@ class Client
         $response = $this->newRequest("documents")
             ->setHeader("Content-Type", "multipart/form-data")
             ->setData(array_merge($settings, [
-                          'file'                => $file,
-                          'external_id'         => $identifier,
-                          'events_callback_url' => $callbackUrl
-                      ]))
+                'file'                => $file,
+                'external_id'         => $identifier,
+                'events_callback_url' => $callbackUrl
+            ]))
             ->send();
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
@@ -80,17 +65,17 @@ class Client
         $response = $this->newRequest("documents")
             ->setHeader("Content-Type", "multipart/form-data")
             ->setData(array_merge($settings, [
-                          'file_from_url'       => $url,
-                          'external_id'         => $identifier,
-                          'events_callback_url' => $callbackUrl
-                      ]))
+                'file_from_url'       => $url,
+                'external_id'         => $identifier,
+                'events_callback_url' => $callbackUrl
+            ]))
             ->send();
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
         }
         return new CreateDocumentResponse($response);
     }
-    
+
     /**
      * Send a document to SignRequest using the template option.
      * @param string $url         the URL of the template we want to sign
@@ -116,6 +101,21 @@ class Client
         }
 
         return new CreateDocumentResponse($response);
+    }
+
+    /**
+     * Gets templates from sign request frontend.
+     * @return \stdClass response
+     * @throws Exceptions\RemoteException
+     */
+    public function getTemplates()
+    {
+        $response = $this->newRequest('templates', 'get')->send();
+        if ($this->hasErrors($response)) {
+            throw new Exceptions\RemoteException($response);
+        }
+        $responseObj = json_decode($response->body);
+        return $responseObj;
     }
 
     /**
@@ -149,7 +149,7 @@ class Client
      * @param string $message
      * @param bool $sendReminders Send automatic reminders
      * @param array $settings Add additional request parameters or override defaults
-     * @return \stdClass The SignRequest
+     * @return \stdClass SignRequest response data
      * @throws Exceptions\SendSignRequestException
      */
     public function sendSignRequest($documentId, $sender, $recipients, $message = null, $sendReminders = false, $settings = []) {
@@ -160,17 +160,18 @@ class Client
         }
         $response = $this->newRequest("signrequests")
             ->setHeader("Content-Type", "application/json")
+            ->setEncoding(Request::ENCODING_JSON)
             ->setData(array_merge([
-                                                  "disable_text"        => true,
-                                                  "disable_attachments" => true,
-                                                  "disable_date"        => true,
-                                              ], $settings, [
-                                                  "document"       => self::API_BASEURL . "/documents/" . $documentId . "/",
-                                                  "from_email"     => $sender,
-                                                  "message"        => $message,
-                                                  "signers"        => $recipients,
-                                                  "send_reminders" => $sendReminders
-                                              ]))
+                                      "disable_text"        => true,
+                                      "disable_attachments" => true,
+                                      "disable_date"        => true,
+                                  ], $settings, [
+                                      "document"       => self::API_BASEURL . "/documents/" . $documentId . "/",
+                                      "from_email"     => $sender,
+                                      "message"        => $message,
+                                      "signers"        => $recipients,
+                                      "send_reminders" => $sendReminders
+                                  ]))
             ->send();
         if ($this->hasErrors($response)) {
             throw new Exceptions\SendSignRequestException($response);
@@ -188,6 +189,7 @@ class Client
     public function sendSignRequestReminder($signRequestId) {
         $response = $this->newRequest("signrequests/{$signRequestId}/resend_signrequest_email", "post")
             ->setHeader("Content-Type", "application/json")
+            ->setEncoding(Request::ENCODING_JSON)
             ->send();
         if ($this->hasErrors($response)) {
             throw new Exceptions\RemoteException($response);
@@ -206,6 +208,7 @@ class Client
         $response = $this
             ->newRequest("signrequests/{$signRequestId}/cancel_signrequest")
             ->setHeader("Content-Type", "application/json")
+            ->setEncoding(Request::ENCODING_JSON)
             ->send();
 
         if ($this->hasErrors($response)) {
@@ -260,6 +263,7 @@ class Client
         }
         $response = $this->newRequest("teams")
             ->setHeader("Content-Type", "application/json")
+            ->setEncoding(Request::ENCODING_JSON)
             ->setData([
                           "name"      => $name,
                           "subdomain" => $subdomain
@@ -304,6 +308,7 @@ class Client
         }
         $response = $this->newRequest("teams/${subdomain}", 'patch')
             ->setHeader("Content-Type", "application/json")
+            ->setEncoding(Request::ENCODING_JSON)
             ->setData($params)
             ->send();
 
